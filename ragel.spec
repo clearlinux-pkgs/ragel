@@ -6,7 +6,7 @@
 #
 Name     : ragel
 Version  : 6.10
-Release  : 2
+Release  : 3
 URL      : https://www.colm.net/files/ragel/ragel-6.10.tar.gz
 Source0  : https://www.colm.net/files/ragel/ragel-6.10.tar.gz
 Source99 : https://www.colm.net/files/ragel/ragel-6.10.tar.gz.asc
