@@ -6,15 +6,16 @@
 #
 Name     : ragel
 Version  : 6.10
-Release  : 5
+Release  : 6
 URL      : https://www.colm.net/files/ragel/ragel-6.10.tar.gz
 Source0  : https://www.colm.net/files/ragel/ragel-6.10.tar.gz
-Source99 : https://www.colm.net/files/ragel/ragel-6.10.tar.gz.asc
+Source1  : https://www.colm.net/files/ragel/ragel-6.10.tar.gz.asc
 Summary  : No detailed summary available
 Group    : Development/Tools
 License  : GPL-2.0 LGPL-2.1
-Requires: ragel-bin
-Requires: ragel-doc
+Requires: ragel-bin = %{version}-%{release}
+Requires: ragel-license = %{version}-%{release}
+Requires: ragel-man = %{version}-%{release}
 BuildRequires : go
 BuildRequires : ruby
 
@@ -26,6 +27,7 @@ BuildRequires : ruby
 %package bin
 Summary: bin components for the ragel package.
 Group: Binaries
+Requires: ragel-license = %{version}-%{release}
 
 %description bin
 bin components for the ragel package.
@@ -34,37 +36,59 @@ bin components for the ragel package.
 %package doc
 Summary: doc components for the ragel package.
 Group: Documentation
+Requires: ragel-man = %{version}-%{release}
 
 %description doc
 doc components for the ragel package.
 
 
+%package license
+Summary: license components for the ragel package.
+Group: Default
+
+%description license
+license components for the ragel package.
+
+
+%package man
+Summary: man components for the ragel package.
+Group: Default
+
+%description man
+man components for the ragel package.
+
+
 %prep
 %setup -q -n ragel-6.10
+cd %{_builddir}/ragel-6.10
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-export LANG=C
-export SOURCE_DATE_EPOCH=1522114286
-export CFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export FCFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export FFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1604603883
+export GCC_IGNORE_WERROR=1
+export CFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
+export FCFLAGS="$FFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
+export FFLAGS="$FFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
+export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
 %configure --disable-static
 make  %{?_smp_mflags}
 
 %check
-export LANG=C
+export LANG=C.UTF-8
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-make VERBOSE=1 V=1 %{?_smp_mflags} check
+make %{?_smp_mflags} check
 
 %install
-export SOURCE_DATE_EPOCH=1522114286
+export SOURCE_DATE_EPOCH=1604603883
 rm -rf %{buildroot}
+mkdir -p %{buildroot}/usr/share/package-licenses/ragel
+cp %{_builddir}/ragel-6.10/COPYING %{buildroot}/usr/share/package-licenses/ragel/5503d2dc9547cb9f904f6c85d12a6c1c734a1282
+cp %{_builddir}/ragel-6.10/aapl/COPYING %{buildroot}/usr/share/package-licenses/ragel/ae820b90e086e3f51ada596db2bd61d9b290e94f
 %make_install
 
 %files
@@ -75,6 +99,14 @@ rm -rf %{buildroot}
 /usr/bin/ragel
 
 %files doc
-%defattr(-,root,root,-)
+%defattr(0644,root,root,0755)
 %doc /usr/share/doc/ragel/*
-%doc /usr/share/man/man1/*
+
+%files license
+%defattr(0644,root,root,0755)
+/usr/share/package-licenses/ragel/5503d2dc9547cb9f904f6c85d12a6c1c734a1282
+/usr/share/package-licenses/ragel/ae820b90e086e3f51ada596db2bd61d9b290e94f
+
+%files man
+%defattr(0644,root,root,0755)
+/usr/share/man/man1/ragel.1
