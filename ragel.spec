@@ -6,7 +6,7 @@
 #
 Name     : ragel
 Version  : 6.10
-Release  : 6
+Release  : 7
 URL      : https://www.colm.net/files/ragel/ragel-6.10.tar.gz
 Source0  : https://www.colm.net/files/ragel/ragel-6.10.tar.gz
 Source1  : https://www.colm.net/files/ragel/ragel-6.10.tar.gz.asc
@@ -16,8 +16,6 @@ License  : GPL-2.0 LGPL-2.1
 Requires: ragel-bin = %{version}-%{release}
 Requires: ragel-license = %{version}-%{release}
 Requires: ragel-man = %{version}-%{release}
-BuildRequires : go
-BuildRequires : ruby
 
 %description
 ======================================
@@ -67,12 +65,12 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1604603883
+export SOURCE_DATE_EPOCH=1647893703
 export GCC_IGNORE_WERROR=1
-export CFLAGS="$CFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export FCFLAGS="$FFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export FFLAGS="$FFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
-export CXXFLAGS="$CXXFLAGS -O3 -falign-functions=32 -fno-lto -fno-math-errno -fno-semantic-interposition -fno-trapping-math "
+export CFLAGS="$CFLAGS -Ofast -falign-functions=32 -fno-lto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 "
+export FCFLAGS="$FFLAGS -Ofast -falign-functions=32 -fno-lto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 "
+export FFLAGS="$FFLAGS -Ofast -falign-functions=32 -fno-lto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 "
+export CXXFLAGS="$CXXFLAGS -Ofast -falign-functions=32 -fno-lto -fno-semantic-interposition -mno-vzeroupper -mprefer-vector-width=256 "
 %configure --disable-static
 make  %{?_smp_mflags}
 
@@ -84,7 +82,7 @@ export no_proxy=localhost,127.0.0.1,0.0.0.0
 make %{?_smp_mflags} check
 
 %install
-export SOURCE_DATE_EPOCH=1604603883
+export SOURCE_DATE_EPOCH=1647893703
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/ragel
 cp %{_builddir}/ragel-6.10/COPYING %{buildroot}/usr/share/package-licenses/ragel/5503d2dc9547cb9f904f6c85d12a6c1c734a1282
