@@ -1,0 +1,84 @@
+From 65540b65ff09330b0293423e3fecc44e63f30614 Mon Sep 17 00:00:00 2001
+From: Adrian Thurston <thurston@colm.net>
+Date: Sun, 12 Mar 2023 21:10:05 -0700
+Subject: [PATCH] when marking input items as processed, ensure parse data
+ matches
+
+After processing the last item for a named machine, mark only those items with
+the same ParseData pointer as processed. Previously, we would mark all
+preceding items as processed. This is wrong and is a problem for sequences
+like:
+
+  machine A // some defs
+  machine B // some defs
+  machine C // some defs
+  machine A // last
+  machine B // last
+  machine C // last
+
+Once the second A block is seen, then the first A, B and C would all get marked
+as processed and ready for writing, even though B and C were not complete yet.
+
+Also, now processing items with no ParseData pointer earlier by immediately
+marking them as processed and moving the last flushed pointer forward even if
+we didn't process an item with a parse data pointer.
+---
+ src/inputdata.cc | 28 ++++++++++++++++------------
+ 1 file changed, 16 insertions(+), 12 deletions(-)
+
+diff --git a/src/inputdata.cc b/src/inputdata.cc
+index 2f58e706..f219b504 100644
+--- a/src/inputdata.cc
++++ b/src/inputdata.cc
+@@ -395,7 +395,10 @@ bool InputData::checkLastRef( InputItem *ii )
+ 	 * 2. Fully process that machine, mark as processed.
+ 	 * 3. Move forward through input items until no longer 
+ 	 */
+-	if ( ii->section != 0 && ii->section->lastReference == ii ) {
++	if ( ii->section == 0 ) {
++		ii->processed = true;
++	}
++	else if ( ii->section->lastReference == ii ) {
+ 		/* Fully Process. */
+ 		ParseData *pd = ii->pd;
+ 
+@@ -425,27 +428,28 @@ bool InputData::checkLastRef( InputItem *ii )
+ 		/* Mark all input items referencing the machine as processed. */
+ 		InputItem *toMark = lastFlush;
+ 		while ( true ) {
+-			toMark->processed = true;
++			if ( toMark->pd == 0 || toMark->pd == pd )
++				toMark->processed = true;
+ 
+ 			if ( toMark == ii )
+ 				break;
+ 
+ 			toMark = toMark->next;
+ 		}
++	}
+ 
+-		/* Move forward, flushing input items until we get to an unprocessed
+-		 * input item. */
+-		while ( lastFlush != 0 && lastFlush->processed ) {
+-			verifyWriteHasData( lastFlush );
++	/* Move forward, flushing input items until we get to an unprocessed
++	 * input item. */
++	while ( lastFlush != 0 && lastFlush->processed ) {
++		verifyWriteHasData( lastFlush );
+ 
+-			if ( errorCount > 0 )
+-				return false;
++		if ( errorCount > 0 )
++			return false;
+ 
+-			/* Flush out. */
+-			writeOutput( lastFlush );
++		/* Flush out. */
++		writeOutput( lastFlush );
+ 
+-			lastFlush = lastFlush->next;
+-		}
++		lastFlush = lastFlush->next;
+ 	}
+ 	return true;
+ }

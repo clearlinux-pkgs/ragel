@@ -1,5 +1,20 @@
-Configure miss: gdc
-Configure miss: the Objective-C compiler
+Configure miss: -lfsm
+Configure miss: ./DIST
+Configure miss: /usr//lib/libcolm.la
+Configure miss: crack
+Configure miss: g++ option to enable C++11 features
+Configure miss: gdc-5
+Configure miss: gdc-6
+Configure miss: gdc-7
+Configure miss: gdc-8
+Configure miss: gnustep-config
+Configure miss: go
+Configure miss: if ragel ASM tests will build 
 Configure miss: javac
-Configure miss: txl
-Configure miss: gmcs
+Configure miss: julia
+Configure miss: mcs
+Configure miss: ocaml
+Configure miss: pygmentize
+Configure miss: ruby
+Configure miss: rustc
+Configure miss: x86_64-generic-linux-gnu-file
